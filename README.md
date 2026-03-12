@@ -8,6 +8,7 @@
 - Pluggable input backends (`keyboard_sim`, `hid_mouse_pygame`, `hid_mouse_evdev` stub, `noop_input`)
 - Pluggable output backends (`pygame_window`, `terminal_ascii`, `ble_ipixel` resilient skeleton)
 - Clean app loop with normalized actions
+- Explicit typed `Scene` protocol contract for scene lifecycle methods
 - MVP `color_toggle` scene that demonstrates input → render → output behavior
 - Test pattern scene for renderer testing
 - Unit, snapshot, integration, and backend contract tests
@@ -58,7 +59,7 @@ output:
 
 ## Switching config/backends
 
-Edit `config.example.yaml`:
+Edit `config.example.yaml` (or use `config.rpi.yaml` for Raspberry Pi defaults):
 
 - Input: `input.backend`
 - Output: `output.backend`

@@ -3,11 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from dotplay.core.framebuffer import FrameBuffer
+from dotplay.types import InputEvent
 
 
 @dataclass
 class PatternScene:
     tick: int = 0
+
+    def handle_event(self, event: InputEvent) -> None:
+        _ = event
 
     def reset(self) -> None:
         self.tick = 0

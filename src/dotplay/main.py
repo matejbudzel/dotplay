@@ -14,6 +14,7 @@ from dotplay.output.base import OutputBackend
 from dotplay.output.ble_ipixel import BleIPixelOutput
 from dotplay.output.pygame_window import PygameWindowOutput
 from dotplay.output.terminal_ascii import TerminalAsciiOutput
+from dotplay.scenes.base import Scene
 from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.test_pattern import PatternScene
 
@@ -47,7 +48,7 @@ def build_output(kind: str, cfg: dict[str, Any]) -> OutputBackend:
     raise ValueError(f"Unknown output backend: {kind}")
 
 
-def build_scene(mode: str) -> object:
+def build_scene(mode: str) -> Scene:
     if mode == "color_toggle":
         return ColorToggleScene()
     if mode == "test_pattern":

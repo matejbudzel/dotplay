@@ -1,0 +1,26 @@
+app:
+  fps: 8
+  max_ticks: null
+
+input:
+  backend: hid_mouse_evdev
+
+output:
+  backend: ble_ipixel
+  led_size: 16
+  show_grid: false
+  ansi_clear: false
+  name_substring: "iPixel"
+  identifier: null
+  mac: null
+  service_uuid: null
+  char_uuid: null
+
+logging:
+  level: WARNING
+
+dev:
+  use_snapshots: false
+
+gameplay:
+  mode: color_toggle

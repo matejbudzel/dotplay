@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from dotplay.core.framebuffer import FrameBuffer
 from dotplay.input.base import InputBackend
 from dotplay.output.base import OutputBackend
+from dotplay.scenes.base import Scene
 from dotplay.types import Action
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class App:
     input_backend: InputBackend
     output_backend: OutputBackend
-    scene: object
+    scene: Scene
     fps: int = 10
 
     def run(self, max_ticks: int | None = None) -> None:
@@ -30,14 +31,11 @@ class App:
             for event in events:
                 if event.action == Action.QUIT:
                     running = False
-                elif event.action == Action.RESET and hasattr(self.scene, "reset"):
+                elif event.action == Action.RESET:
                     self.scene.reset()
-                if hasattr(self.scene, "handle_event"):
-                    self.scene.handle_event(event)
-            if hasattr(self.scene, "update"):
-                self.scene.update()
-            if hasattr(self.scene, "render"):
-                self.scene.render(fb)
+                self.scene.handle_event(event)
+            self.scene.update()
+            self.scene.render(fb)
             self.output_backend.push(fb)
             tick += 1
             if max_ticks is not None and tick >= max_ticks:
