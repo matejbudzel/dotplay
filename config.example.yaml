@@ -1,0 +1,26 @@
+app:
+  fps: 10
+  max_ticks: 200
+
+input:
+  backend: keyboard_sim
+
+output:
+  backend: pygame_window
+  led_size: 16
+  show_grid: true
+  ansi_clear: true
+  name_substring: "iPixel"
+  identifier: null
+  mac: null
+  service_uuid: null
+  char_uuid: null
+
+logging:
+  level: INFO
+
+dev:
+  use_snapshots: true
+
+gameplay:
+  mode: color_toggle

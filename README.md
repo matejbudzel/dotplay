@@ -1,0 +1,72 @@
+# dotplay
+
+`dotplay` is a small, backend-agnostic 32x32 RGB framebuffer platform for toy games, UI experiments, and BLE LED boards.
+
+## What exists now
+
+- 32x32 framebuffer core (draw ops + deterministic serialization + ASCII + PNG export)
+- Pluggable input backends (`keyboard_sim`, `hid_mouse_pygame`, `hid_mouse_evdev` stub, `noop_input`)
+- Pluggable output backends (`pygame_window`, `terminal_ascii`, `ble_ipixel` resilient skeleton)
+- Clean app loop with normalized actions
+- MVP `color_toggle` scene that demonstrates input → render → output behavior
+- Test pattern scene for renderer testing
+- Unit, snapshot, integration, and backend contract tests
+
+## Planned
+
+- More scenes/games
+- Full Linux evdev runtime backend
+- Device-specific BLE protocol tuning for iPixel variants
+
+## Setup (offline-ready after bootstrap)
+
+```bash
+make setup
+```
+
+This creates/reuses `.venv`, installs project + dev tools, and verifies imports/config/tests/lint/typecheck.
+
+## Dev workflow
+
+```bash
+make run-dev
+make test
+make lint
+make format
+make typecheck
+```
+
+## First app demo: color toggle controls
+
+Default scene is `color_toggle`.
+
+Keyboard controls (with `keyboard_sim`):
+
+- **Space/W**: turn panel on
+- **S**: turn panel off
+- **A**: turn panel red
+- **D**: turn panel blue
+- **R**: reset/off
+- **Esc**: quit
+
+To run in terminal preview instead of pygame window, set in config:
+
+```yaml
+output:
+  backend: terminal_ascii
+```
+
+## Switching config/backends
+
+Edit `config.example.yaml`:
+
+- Input: `input.backend`
+- Output: `output.backend`
+- Scene: `gameplay.mode`
+- FPS: `app.fps`
+
+Run with custom file:
+
+```bash
+dotplay --config path/to/config.yaml
+```
