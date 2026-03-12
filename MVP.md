@@ -51,12 +51,12 @@ This checklist tracks the first-version work needed to satisfy the original proj
 - [x] Integration test for loop execution with fake backends.
 - [x] Lint + typecheck + tests in setup verification.
 - [x] Add deterministic tests for `color_toggle` scene behavior.
-- [ ] Add a small smoke test that runs CLI with terminal backend and bounded ticks.
+- [x] Add a small smoke test that runs CLI with terminal backend and bounded ticks.
 
 ## 7) Docs and deployment
 
 - [x] README with setup, commands, and backend switching.
 - [x] Raspberry Pi deployment guide with apt baseline and systemd sample.
 - [x] AGENTS.md project guidance.
-- [ ] Add troubleshooting matrix (pygame missing, BLE unavailable, evdev permissions).
+- [x] Add troubleshooting matrix (pygame missing, BLE unavailable, evdev permissions).
 - [ ] Add release checklist for first deploy to Pi.
