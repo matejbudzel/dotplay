@@ -32,6 +32,8 @@ class App:
                     running = False
                 elif event.action == Action.RESET and hasattr(self.scene, "reset"):
                     self.scene.reset()
+                if hasattr(self.scene, "handle_event"):
+                    self.scene.handle_event(event)
             if hasattr(self.scene, "update"):
                 self.scene.update()
             if hasattr(self.scene, "render"):

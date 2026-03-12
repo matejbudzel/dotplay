@@ -14,6 +14,7 @@ from dotplay.output.base import OutputBackend
 from dotplay.output.ble_ipixel import BleIPixelOutput
 from dotplay.output.pygame_window import PygameWindowOutput
 from dotplay.output.terminal_ascii import TerminalAsciiOutput
+from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.test_pattern import PatternScene
 
 
@@ -46,6 +47,14 @@ def build_output(kind: str, cfg: dict[str, Any]) -> OutputBackend:
     raise ValueError(f"Unknown output backend: {kind}")
 
 
+def build_scene(mode: str) -> object:
+    if mode == "color_toggle":
+        return ColorToggleScene()
+    if mode == "test_pattern":
+        return PatternScene()
+    raise ValueError(f"Unknown scene mode: {mode}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config.example.yaml")
@@ -56,13 +65,15 @@ def main() -> None:
 
     input_kind = cfg.get("input", {}).get("backend", "keyboard_sim")
     output_kind = cfg.get("output", {}).get("backend", "pygame_window")
+    scene_mode = cfg.get("gameplay", {}).get("mode", "color_toggle")
+
     input_backend = build_input(input_kind)
     output_backend = build_output(output_kind, cfg.get("output", {}))
 
     app = App(
         input_backend=input_backend,
         output_backend=output_backend,
-        scene=PatternScene(),
+        scene=build_scene(scene_mode),
         fps=int(cfg.get("app", {}).get("fps", 10)),
     )
     app.run(max_ticks=cfg.get("app", {}).get("max_ticks"))

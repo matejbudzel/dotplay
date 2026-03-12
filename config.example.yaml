@@ -23,4 +23,4 @@ dev:
   use_snapshots: true
 
 gameplay:
-  mode: test_pattern
+  mode: color_toggle
