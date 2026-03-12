@@ -7,13 +7,13 @@ This checklist tracks the first-version work needed to satisfy the original proj
 - [x] Keep strict backend-agnostic pipeline: input → normalized events → scene logic → framebuffer → output.
 - [x] Maintain a deterministic fixed-size 32×32 framebuffer with draw primitives and serialization.
 - [x] Keep a simple main loop with polling, update, render, push, timing control, and graceful shutdown.
-- [ ] Add explicit scene protocol typing (instead of runtime `hasattr`) for cleaner contracts.
+- [x] Add explicit scene protocol typing (instead of runtime `hasattr`) for cleaner contracts.
 
 ## 2) Config and environment
 
 - [x] YAML-based runtime config with sample configuration.
 - [x] Offline-first bootstrap script (`scripts/setup.sh`) that installs and validates tests/lint/typecheck.
-- [ ] Add a production Pi config preset (`config.rpi.yaml`) with low FPS and BLE defaults.
+- [x] Add a production Pi config preset (`config.rpi.yaml`) with low FPS and BLE defaults.
 - [ ] Add config validation schema with user-friendly error messages for invalid values.
 
 ## 3) Input backends
@@ -51,12 +51,12 @@ This checklist tracks the first-version work needed to satisfy the original proj
 - [x] Integration test for loop execution with fake backends.
 - [x] Lint + typecheck + tests in setup verification.
 - [x] Add deterministic tests for `color_toggle` scene behavior.
-- [ ] Add a small smoke test that runs CLI with terminal backend and bounded ticks.
+- [x] Add a small smoke test that runs CLI with terminal backend and bounded ticks.
 
 ## 7) Docs and deployment
 
 - [x] README with setup, commands, and backend switching.
 - [x] Raspberry Pi deployment guide with apt baseline and systemd sample.
 - [x] AGENTS.md project guidance.
-- [ ] Add troubleshooting matrix (pygame missing, BLE unavailable, evdev permissions).
+- [x] Add troubleshooting matrix (pygame missing, BLE unavailable, evdev permissions).
 - [ ] Add release checklist for first deploy to Pi.

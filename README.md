@@ -8,6 +8,7 @@
 - Pluggable input backends (`keyboard_sim`, `hid_mouse_pygame`, `hid_mouse_evdev` stub, `noop_input`)
 - Pluggable output backends (`pygame_window`, `terminal_ascii`, `ble_ipixel` resilient skeleton)
 - Clean app loop with normalized actions
+- Explicit typed `Scene` protocol contract for scene lifecycle methods
 - MVP `color_toggle` scene that demonstrates input → render → output behavior
 - Test pattern scene for renderer testing
 - Unit, snapshot, integration, and backend contract tests
@@ -58,7 +59,7 @@ output:
 
 ## Switching config/backends
 
-Edit `config.example.yaml`:
+Edit `config.example.yaml` (or use `config.rpi.yaml` for Raspberry Pi defaults):
 
 - Input: `input.backend`
 - Output: `output.backend`
@@ -70,3 +71,12 @@ Run with custom file:
 ```bash
 dotplay --config path/to/config.yaml
 ```
+
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `ModuleNotFoundError: pygame` or pygame window fails to open | `pygame` not installed in active environment | Run `make setup` (or `pip install -e .[dev]`) and use `output.backend: terminal_ascii` when running headless. |
+| BLE output cannot connect (`ble_ipixel`) | Device out of range, identifier mismatch, or BLE stack unavailable | Verify adapter with `bluetoothctl`, set `output.name_substring` / `output.identifier` / `output.mac` correctly, and keep `terminal_ascii` as fallback for offline debugging. |
+| `hid_mouse_evdev` receives no input on Linux | Missing permissions or wrong device match substring | Confirm event device path and grant access (group/udev), then set the configured device-name substring to match your mouse-like device. |
