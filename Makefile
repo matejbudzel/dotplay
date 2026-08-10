@@ -5,7 +5,7 @@ setup:
 	bash scripts/setup.sh
 
 run-dev:
-	. .venv/bin/activate && dotplay --config config.example.yaml
+	. .venv/bin/activate && dotplay --config config.example.yaml --grid-size $(GRID_SIZE)
 
 run-tui:
 	. .venv/bin/activate && dotplay --config config.tui.yaml --grid-size $(GRID_SIZE)

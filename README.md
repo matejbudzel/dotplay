@@ -98,6 +98,10 @@ make run-tui GRID_SIZE=16
 For other launch commands, use `dotplay --config config.tui.yaml --grid-size 8`.
 GNU Make variables use `GRID_SIZE=8`; `make run-tui --grid-size=8` is not valid Make syntax.
 
+The Pygame preview supports the same values: `make run-dev GRID_SIZE=8` or
+`make run-dev GRID_SIZE=16`. Its window remains the same size, so each grid cell is
+automatically enlarged to fill it.
+
 ## Switching config/backends
 
 Edit `config.example.yaml` (or use `config.rpi.yaml` for Raspberry Pi defaults):

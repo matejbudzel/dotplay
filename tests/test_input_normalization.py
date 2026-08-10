@@ -16,3 +16,4 @@ def test_keyboard_sim_maps_arrow_keys_when_pygame_is_available() -> None:
     assert list(keymap.values()).count(Action.RIGHT) == 2
     assert list(keymap.values()).count(Action.ROTATE) == 2
     assert list(keymap.values()).count(Action.SOFT_DROP) == 2
+    assert keymap[ord("q")] is Action.QUIT

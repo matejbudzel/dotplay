@@ -13,13 +13,13 @@ class PygameWindowOutput(OutputBackend):
     def __init__(self, led_size: int = 16, show_grid: bool = False, grid_size: int = 32) -> None:
         if pygame is None:
             raise RuntimeError("pygame is required for pygame_window output")
-        self.led_size = led_size
+        self.led_size = 32 * led_size // grid_size
         self.show_grid = show_grid
         self.grid_size = grid_size
         self.header_height = 28
         self.footer_height = 24
-        width = grid_size * led_size
-        height = self.header_height + grid_size * led_size + self.footer_height
+        width = 32 * led_size
+        height = self.header_height + 32 * led_size + self.footer_height
         self.surface = pygame.display.set_mode((width, height))
         pygame.display.set_caption("dotplay")
         pygame.font.init()
