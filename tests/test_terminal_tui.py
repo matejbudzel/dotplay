@@ -4,6 +4,7 @@ import pytest
 
 from dotplay.input.terminal_tui import action_for_key
 from dotplay.main import build_scenes, validate_backend_pair
+from dotplay.output.terminal_tui import TerminalTuiOutput
 from dotplay.types import Action
 
 
@@ -36,3 +37,9 @@ def test_scene_shortcuts_have_a_stable_order() -> None:
         "AnimationScene",
         "LightScene",
     ]
+
+
+def test_terminal_tui_uses_braille_dots_for_lower_brightness() -> None:
+    assert TerminalTuiOutput._braille_glyph((20, 20, 20)) == "⠐⠀"
+    assert TerminalTuiOutput._braille_glyph((100, 100, 100)) == "⠺⠂"
+    assert TerminalTuiOutput._braille_glyph((255, 255, 255)) == "⠿⠇"

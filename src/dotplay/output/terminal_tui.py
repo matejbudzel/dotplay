@@ -112,19 +112,40 @@ class TerminalTuiOutput(OutputBackend):
             glyph = "··" if self.show_grid else "  "
             attributes = curses.A_DIM if self.show_grid else curses.A_NORMAL
         else:
-            glyph = "██"
+            glyph = self._braille_glyph(color)
             attributes = self._color_attribute(color)
         with suppress(curses.error):
             screen.addstr(y, x, glyph, attributes)
+
+    @staticmethod
+    def _braille_glyph(color: Color) -> str:
+        """Render brightness using six clear 3×3 Braille-dot patterns."""
+        brightness = sum(color) // 3
+        patterns = (
+            ((1, 1),),
+            ((1, 0), (0, 1), (2, 1), (1, 2)),
+            ((1, 0), (0, 1), (1, 1), (2, 1), (1, 2)),
+            ((0, 0), (2, 0), (1, 1), (0, 2), (2, 2)),
+            ((1, 0), (0, 1), (2, 1), (0, 0), (2, 0), (1, 2), (0, 2), (2, 2)),
+            ((0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (2, 2)),
+        )
+        dots = patterns[min(brightness * len(patterns) // 256, len(patterns) - 1)]
+        braille_bits = ((1, 2, 4, 64), (8, 16, 32, 128))
+        left_bits = 0
+        right_bits = 0
+        for pixel_x, pixel_y in dots:
+            if pixel_x < 2:
+                left_bits |= braille_bits[pixel_x][pixel_y]
+            else:
+                right_bits |= braille_bits[0][pixel_y]
+        return f"{chr(0x2800 + left_bits)}{chr(0x2800 + right_bits)}"
 
     def _color_attribute(self, color: Color) -> int:
         if not self.session.colors_enabled:
             return curses.A_BOLD
         red, green, blue = color
         brightest = max(color)
-        if brightest < 64:
-            pair = curses.COLOR_BLACK + 1
-        elif brightest - min(color) < 32:
+        if brightest - min(color) < 32:
             pair = curses.COLOR_WHITE + 1
         elif red >= green and red >= blue:
             pair = (curses.COLOR_YELLOW if green > red // 2 else curses.COLOR_RED) + 1

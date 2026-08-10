@@ -85,9 +85,9 @@ class LightScene:
             self.hue_index = (self.hue_index - 1) % (len(HUES) + 1)
         elif event.action == Action.RIGHT:
             self.hue_index = (self.hue_index + 1) % (len(HUES) + 1)
-        elif event.action == Action.UP:
+        elif event.action in {Action.UP, Action.ROTATE}:
             self.brightness = min(self.brightness + 10, 100)
-        elif event.action == Action.DOWN:
+        elif event.action in {Action.DOWN, Action.SOFT_DROP}:
             self.brightness = max(self.brightness - 10, 0)
         elif event.action == Action.NEXT_STYLE:
             self.style_index = (self.style_index + 1) % len(STYLES)

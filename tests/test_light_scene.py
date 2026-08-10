@@ -27,3 +27,13 @@ def test_light_scene_changes_hue_brightness_and_gradient() -> None:
     assert scene.brightness == 60
     assert scene.style_name == "Circular fade"
     assert fb.get_pixel(3, 3)[0] > fb.get_pixel(0, 0)[0]
+
+
+def test_light_scene_accepts_keyboard_arrow_actions_for_brightness() -> None:
+    scene = LightScene()
+
+    scene.handle_event(InputEvent(Action.ROTATE))
+    scene.handle_event(InputEvent(Action.SOFT_DROP))
+    scene.handle_event(InputEvent(Action.SOFT_DROP))
+
+    assert scene.brightness == 40
