@@ -1,0 +1,16 @@
+app:
+  fps: 20
+  max_ticks: null
+
+input:
+  backend: terminal_tui
+
+output:
+  backend: terminal_tui
+  show_grid: false
+
+logging:
+  level: WARNING
+
+gameplay:
+  mode: color_toggle

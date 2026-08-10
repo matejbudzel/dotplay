@@ -5,8 +5,8 @@
 ## What exists now
 
 - 32x32 framebuffer core (draw ops + deterministic serialization + ASCII + PNG export)
-- Pluggable input backends (`keyboard_sim`, `hid_mouse_pygame`, `hid_mouse_evdev` stub, `noop_input`)
-- Pluggable output backends (`pygame_window`, `terminal_ascii`, `ble_ipixel` resilient skeleton)
+- Pluggable input backends (`keyboard_sim`, `terminal_tui`, `hid_mouse_pygame`, `hid_mouse_evdev` stub, `noop_input`)
+- Pluggable output backends (`pygame_window`, `terminal_tui`, `terminal_ascii`, `ble_ipixel` resilient skeleton)
 - Clean app loop with normalized actions
 - Explicit typed `Scene` protocol contract for scene lifecycle methods
 - MVP `color_toggle` scene that demonstrates input → render → output behavior
@@ -56,6 +56,31 @@ To run in terminal preview instead of pygame window, set in config:
 output:
   backend: terminal_ascii
 ```
+
+For an interactive full-screen terminal grid, pair the TUI input and output backends:
+
+```yaml
+input:
+  backend: terminal_tui
+output:
+  backend: terminal_tui
+  show_grid: false
+```
+
+The TUI uses Left/Right or A/D to move, Up/W to rotate, Down/S to soft drop,
+Space to hard drop, R to reset, P to pause, and Q or Esc to quit. `tui` is also
+accepted as a shorter backend alias.
+
+### Run the terminal UI
+
+```bash
+make setup
+make run-tui
+```
+
+This uses [`config.tui.yaml`](config.tui.yaml). Keep the terminal at least 64 columns
+wide and 35 rows tall; the UI will show its required dimensions if it is too small.
+Quit with **Q** or **Esc** and the terminal will be restored normally.
 
 ## Switching config/backends
 

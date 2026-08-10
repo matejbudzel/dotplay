@@ -6,6 +6,9 @@ setup:
 run-dev:
 	. .venv/bin/activate && dotplay --config config.example.yaml
 
+run-tui:
+	. .venv/bin/activate && dotplay --config config.tui.yaml
+
 test:
 	. .venv/bin/activate && pytest
 

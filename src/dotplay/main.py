@@ -10,13 +10,25 @@ from dotplay.input.base import InputBackend
 from dotplay.input.hid_mouse_pygame import HidMousePygameInput
 from dotplay.input.keyboard_sim import KeyboardSimInput
 from dotplay.input.noop_input import NoopInput
+from dotplay.input.terminal_tui import TerminalTuiInput
 from dotplay.output.base import OutputBackend
 from dotplay.output.ble_ipixel import BleIPixelOutput
 from dotplay.output.pygame_window import PygameWindowOutput
 from dotplay.output.terminal_ascii import TerminalAsciiOutput
+from dotplay.output.terminal_tui import TerminalTuiOutput
 from dotplay.scenes.base import Scene
 from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.test_pattern import PatternScene
+
+TUI_BACKENDS = {"terminal_tui", "tui"}
+
+
+def validate_backend_pair(input_kind: str, output_kind: str) -> None:
+    """Ensure the full-screen terminal renderer owns both terminal directions."""
+    if (input_kind in TUI_BACKENDS) != (output_kind in TUI_BACKENDS):
+        raise ValueError(
+            "terminal_tui requires both input.backend and output.backend to be terminal_tui"
+        )
 
 
 def build_input(kind: str) -> InputBackend:
@@ -26,6 +38,8 @@ def build_input(kind: str) -> InputBackend:
         return HidMousePygameInput()
     if kind == "noop_input":
         return NoopInput()
+    if kind in TUI_BACKENDS:
+        return TerminalTuiInput()
     raise ValueError(f"Unknown input backend: {kind}")
 
 
@@ -37,6 +51,8 @@ def build_output(kind: str, cfg: dict[str, Any]) -> OutputBackend:
         )
     if kind == "terminal_ascii":
         return TerminalAsciiOutput(ansi_clear=bool(cfg.get("ansi_clear", True)))
+    if kind in TUI_BACKENDS:
+        return TerminalTuiOutput(show_grid=bool(cfg.get("show_grid", False)))
     if kind == "ble_ipixel":
         return BleIPixelOutput(
             name_substring=cfg.get("name_substring"),
@@ -68,6 +84,7 @@ def main() -> None:
     output_kind = cfg.get("output", {}).get("backend", "pygame_window")
     scene_mode = cfg.get("gameplay", {}).get("mode", "color_toggle")
 
+    validate_backend_pair(input_kind, output_kind)
     input_backend = build_input(input_kind)
     output_backend = build_output(output_kind, cfg.get("output", {}))
 
