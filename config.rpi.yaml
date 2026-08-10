@@ -1,6 +1,7 @@
 app:
   fps: 8
   max_ticks: null
+  grid_size: 32
 
 input:
   backend: hid_mouse_evdev

@@ -1,6 +1,6 @@
 # dotplay
 
-`dotplay` is a small, backend-agnostic 32x32 RGB framebuffer platform for toy games, UI experiments, and BLE LED boards.
+`dotplay` is a small, backend-agnostic RGB framebuffer platform for toy games, UI experiments, and BLE LED boards. It supports 8×8, 16×16, and 32×32 grids.
 
 ## What exists now
 
@@ -78,9 +78,20 @@ make setup
 make run-tui
 ```
 
-This uses [`config.tui.yaml`](config.tui.yaml). Keep the terminal at least 64 columns
-wide and 35 rows tall; the UI will show its required dimensions if it is too small.
-Quit with **Q** or **Esc** and the terminal will be restored normally.
+This uses [`config.tui.yaml`](config.tui.yaml). The terminal needs at least twice the
+grid size in columns and three more rows than the grid size (64×35 for 32×32). The UI
+will show its required dimensions if it is too small. Quit with **Q** or **Esc** and the
+terminal will be restored normally.
+
+Choose an 8×8 or 16×16 grid without changing configuration:
+
+```bash
+make run-tui GRID_SIZE=8
+make run-tui GRID_SIZE=16
+```
+
+For other launch commands, use `dotplay --config config.tui.yaml --grid-size 8`.
+GNU Make variables use `GRID_SIZE=8`; `make run-tui --grid-size=8` is not valid Make syntax.
 
 ## Switching config/backends
 

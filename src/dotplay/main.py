@@ -43,11 +43,12 @@ def build_input(kind: str) -> InputBackend:
     raise ValueError(f"Unknown input backend: {kind}")
 
 
-def build_output(kind: str, cfg: dict[str, Any]) -> OutputBackend:
+def build_output(kind: str, cfg: dict[str, Any], grid_size: int = 32) -> OutputBackend:
     if kind == "pygame_window":
         return PygameWindowOutput(
             led_size=int(cfg.get("led_size", 16)),
             show_grid=bool(cfg.get("show_grid", False)),
+            grid_size=grid_size,
         )
     if kind == "terminal_ascii":
         return TerminalAsciiOutput(ansi_clear=bool(cfg.get("ansi_clear", True)))
@@ -75,6 +76,7 @@ def build_scene(mode: str) -> Scene:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config.example.yaml")
+    parser.add_argument("--grid-size", type=int, choices=(8, 16, 32))
     args = parser.parse_args()
     cfg = load_config(args.config)
 
@@ -83,16 +85,20 @@ def main() -> None:
     input_kind = cfg.get("input", {}).get("backend", "keyboard_sim")
     output_kind = cfg.get("output", {}).get("backend", "pygame_window")
     scene_mode = cfg.get("gameplay", {}).get("mode", "color_toggle")
+    grid_size = args.grid_size or int(cfg.get("app", {}).get("grid_size", 32))
+    if grid_size not in {8, 16, 32}:
+        raise ValueError("grid_size must be one of: 8, 16, 32")
 
     validate_backend_pair(input_kind, output_kind)
     input_backend = build_input(input_kind)
-    output_backend = build_output(output_kind, cfg.get("output", {}))
+    output_backend = build_output(output_kind, cfg.get("output", {}), grid_size)
 
     app = App(
         input_backend=input_backend,
         output_backend=output_backend,
         scene=build_scene(scene_mode),
         fps=int(cfg.get("app", {}).get("fps", 10)),
+        grid_size=grid_size,
     )
     app.run(max_ticks=cfg.get("app", {}).get("max_ticks"))
 

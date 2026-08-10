@@ -10,12 +10,12 @@ from dotplay.output.base import OutputBackend
 
 
 class PygameWindowOutput(OutputBackend):
-    def __init__(self, led_size: int = 16, show_grid: bool = False) -> None:
+    def __init__(self, led_size: int = 16, show_grid: bool = False, grid_size: int = 32) -> None:
         if pygame is None:
             raise RuntimeError("pygame is required for pygame_window output")
         self.led_size = led_size
         self.show_grid = show_grid
-        width, height = 32 * led_size, 32 * led_size
+        width, height = grid_size * led_size, grid_size * led_size
         self.surface = pygame.display.set_mode((width, height))
         pygame.display.set_caption("dotplay")
 

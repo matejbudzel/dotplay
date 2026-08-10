@@ -1,6 +1,7 @@
 app:
   fps: 20
   max_ticks: null
+  grid_size: 32
 
 input:
   backend: terminal_tui

@@ -94,7 +94,8 @@ class TerminalTuiOutput(OutputBackend):
         for y in range(framebuffer.height):
             for x in range(framebuffer.width):
                 self._draw_cell(screen, y + 2, x * 2, framebuffer.get_pixel(x, y))
-        self._write(screen, framebuffer.height + 2, 0, "32×32 framebuffer", width, curses.A_DIM)
+        dimensions = f"{framebuffer.width}×{framebuffer.height} framebuffer"
+        self._write(screen, framebuffer.height + 2, 0, dimensions, width, curses.A_DIM)
         screen.refresh()
 
     def _draw_cell(self, screen: curses.window, y: int, x: int, color: Color) -> None:

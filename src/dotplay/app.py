@@ -19,9 +19,10 @@ class App:
     output_backend: OutputBackend
     scene: Scene
     fps: int = 10
+    grid_size: int = 32
 
     def run(self, max_ticks: int | None = None) -> None:
-        fb = FrameBuffer()
+        fb = FrameBuffer(width=self.grid_size, height=self.grid_size)
         running = True
         tick = 0
         frame_time = 1.0 / max(self.fps, 1)
