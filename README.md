@@ -71,6 +71,11 @@ The TUI uses Left/Right or A/D to move, Up/W to rotate, Down/S to soft drop,
 Space to hard drop, R to reset, P to pause, and Q or Esc to quit. `tui` is also
 accepted as a shorter backend alias.
 
+Press **M** to cycle between mini-app modes, or use **1**–**9** to select one directly.
+The footer shows the active mode and its short control hint. The bundled modes are Test,
+Pattern, and Animation; within Animation, use Left/Right to switch between Fireworks and
+Waves.
+
 ### Run the terminal UI
 
 ```bash

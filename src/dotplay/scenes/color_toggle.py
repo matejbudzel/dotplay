@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 from dotplay.core.framebuffer import FrameBuffer
 from dotplay.types import Action, InputEvent
@@ -8,6 +9,8 @@ from dotplay.types import Action, InputEvent
 
 @dataclass
 class ColorToggleScene:
+    title: ClassVar[str] = "Test"
+    description: ClassVar[str] = "Press arrows to change grid color"
     is_on: bool = False
     color: tuple[int, int, int] = (255, 255, 255)
 

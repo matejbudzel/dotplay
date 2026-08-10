@@ -16,11 +16,13 @@ from dotplay.output.ble_ipixel import BleIPixelOutput
 from dotplay.output.pygame_window import PygameWindowOutput
 from dotplay.output.terminal_ascii import TerminalAsciiOutput
 from dotplay.output.terminal_tui import TerminalTuiOutput
+from dotplay.scenes.animation import AnimationScene
 from dotplay.scenes.base import Scene
 from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.test_pattern import PatternScene
 
 TUI_BACKENDS = {"terminal_tui", "tui"}
+SCENE_MODES = ("color_toggle", "test_pattern", "animation")
 
 
 def validate_backend_pair(input_kind: str, output_kind: str) -> None:
@@ -70,7 +72,15 @@ def build_scene(mode: str) -> Scene:
         return ColorToggleScene()
     if mode == "test_pattern":
         return PatternScene()
+    if mode == "animation":
+        return AnimationScene()
     raise ValueError(f"Unknown scene mode: {mode}")
+
+
+def build_scenes(initial_mode: str) -> list[Scene]:
+    if initial_mode not in SCENE_MODES:
+        raise ValueError(f"Unknown scene mode: {initial_mode}")
+    return [ColorToggleScene(), PatternScene(), AnimationScene()]
 
 
 def main() -> None:
@@ -93,12 +103,14 @@ def main() -> None:
     input_backend = build_input(input_kind)
     output_backend = build_output(output_kind, cfg.get("output", {}), grid_size)
 
+    scenes = build_scenes(scene_mode)
     app = App(
         input_backend=input_backend,
         output_backend=output_backend,
-        scene=build_scene(scene_mode),
+        scene=scenes[SCENE_MODES.index(scene_mode)],
         fps=int(cfg.get("app", {}).get("fps", 10)),
         grid_size=grid_size,
+        scenes=scenes,
     )
     app.run(max_ticks=cfg.get("app", {}).get("max_ticks"))
 

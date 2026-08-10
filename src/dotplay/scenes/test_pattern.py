@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 from dotplay.core.framebuffer import FrameBuffer
 from dotplay.types import InputEvent
@@ -8,6 +9,8 @@ from dotplay.types import InputEvent
 
 @dataclass
 class PatternScene:
+    title: ClassVar[str] = "Pattern"
+    description: ClassVar[str] = "Animated checkerboard test pattern"
     tick: int = 0
 
     def handle_event(self, event: InputEvent) -> None:
@@ -27,6 +30,6 @@ class PatternScene:
                 if (x + y) % 2 == 0:
                     fb.set_pixel(x, y, (16, 16, 16))
         # moving bar
-        y = self.tick % fb.height
+        y = (self.tick // 4) % fb.height
         fb.draw_line(0, y, fb.width - 1, y, (255, 0, 0))
         fb.draw_rect(2, 2, fb.width - 4, fb.height - 4, (0, 200, 80), fill=False)

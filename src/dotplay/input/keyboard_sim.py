@@ -16,6 +16,16 @@ DEFAULT_KEYMAP: dict[int, Action] = {
     119: Action.ROTATE,  # W
     115: Action.SOFT_DROP,  # S
     114: Action.RESET,  # R
+    109: Action.NEXT_MODE,  # M
+    49: Action.MODE_1,  # 1
+    50: Action.MODE_2,  # 2
+    51: Action.MODE_3,  # 3
+    52: Action.MODE_4,  # 4
+    53: Action.MODE_5,  # 5
+    54: Action.MODE_6,  # 6
+    55: Action.MODE_7,  # 7
+    56: Action.MODE_8,  # 8
+    57: Action.MODE_9,  # 9
     32: Action.HARD_DROP,  # Space
     27: Action.QUIT,  # Esc
 }

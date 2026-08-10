@@ -64,15 +64,16 @@ class TerminalTuiSession:
 class TerminalTuiOutput(OutputBackend):
     """Curses renderer that presents the framebuffer as an interactive grid."""
 
-    _HEADER = (
-        "dotplay  •  ←→/A D move  •  ↑/W rotate  •  ↓/S soft drop  •  "
-        "Space drop  •  R reset  •  Q quit"
-    )
+    _HEADER = "dotplay  •  M next mode  •  1–9 select mode  •  Q quit"
 
     def __init__(self, session: TerminalTuiSession | None = None, show_grid: bool = False) -> None:
         self.session = session or TerminalTuiSession.shared()
         self.show_grid = show_grid
+        self.status = ""
         self.session.start()
+
+    def set_status(self, status: str) -> None:
+        self.status = status
 
     def push(self, framebuffer: FrameBuffer) -> None:
         screen = self.session.screen
@@ -94,8 +95,16 @@ class TerminalTuiOutput(OutputBackend):
         for y in range(framebuffer.height):
             for x in range(framebuffer.width):
                 self._draw_cell(screen, y + 2, x * 2, framebuffer.get_pixel(x, y))
-        dimensions = f"{framebuffer.width}×{framebuffer.height} framebuffer"
-        self._write(screen, framebuffer.height + 2, 0, dimensions, width, curses.A_DIM)
+        dimensions = f"{framebuffer.width}×{framebuffer.height}"
+        footer = f"{dimensions}  •  {self.status}" if self.status else dimensions
+        self._write(
+            screen,
+            framebuffer.height + 2,
+            0,
+            self._ellipsize(footer, width - 1),
+            width,
+            curses.A_DIM,
+        )
         screen.refresh()
 
     def _draw_cell(self, screen: curses.window, y: int, x: int, color: Color) -> None:
@@ -133,6 +142,14 @@ class TerminalTuiOutput(OutputBackend):
     ) -> None:
         with suppress(curses.error):
             screen.addnstr(y, x, text, max(width - x - 1, 0), attributes)
+
+    @staticmethod
+    def _ellipsize(text: str, width: int) -> str:
+        if len(text) <= width:
+            return text
+        if width <= 1:
+            return "…"[:width]
+        return f"{text[: width - 1]}…"
 
     def close(self) -> None:
         self.session.close()
