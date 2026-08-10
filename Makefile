@@ -10,6 +10,9 @@ run-dev:
 run-tui:
 	. .venv/bin/activate && dotplay --config config.tui.yaml --grid-size $(GRID_SIZE)
 
+run-web:
+	. .venv/bin/activate && dotplay --config config.web.yaml --grid-size $(GRID_SIZE)
+
 test:
 	. .venv/bin/activate && pytest
 

@@ -11,11 +11,13 @@ from dotplay.input.hid_mouse_pygame import HidMousePygameInput
 from dotplay.input.keyboard_sim import KeyboardSimInput
 from dotplay.input.noop_input import NoopInput
 from dotplay.input.terminal_tui import TerminalTuiInput
+from dotplay.input.web import WebInput
 from dotplay.output.base import OutputBackend
 from dotplay.output.ble_ipixel import BleIPixelOutput
 from dotplay.output.pygame_window import PygameWindowOutput
 from dotplay.output.terminal_ascii import TerminalAsciiOutput
 from dotplay.output.terminal_tui import TerminalTuiOutput
+from dotplay.output.web import WebOutput
 from dotplay.scenes.animation import AnimationScene
 from dotplay.scenes.base import Scene
 from dotplay.scenes.color_toggle import ColorToggleScene
@@ -23,6 +25,7 @@ from dotplay.scenes.light import LightScene
 from dotplay.scenes.test_pattern import PatternScene
 
 TUI_BACKENDS = {"terminal_tui", "tui"}
+WEB_BACKENDS = {"web"}
 SCENE_MODES = ("color_toggle", "test_pattern", "animation", "light")
 
 
@@ -32,9 +35,11 @@ def validate_backend_pair(input_kind: str, output_kind: str) -> None:
         raise ValueError(
             "terminal_tui requires both input.backend and output.backend to be terminal_tui"
         )
+    if (input_kind in WEB_BACKENDS) != (output_kind in WEB_BACKENDS):
+        raise ValueError("web requires both input.backend and output.backend to be web")
 
 
-def build_input(kind: str) -> InputBackend:
+def build_input(kind: str, web_cfg: dict[str, Any] | None = None) -> InputBackend:
     if kind == "keyboard_sim":
         return KeyboardSimInput()
     if kind == "hid_mouse_pygame":
@@ -43,10 +48,15 @@ def build_input(kind: str) -> InputBackend:
         return NoopInput()
     if kind in TUI_BACKENDS:
         return TerminalTuiInput()
+    if kind in WEB_BACKENDS:
+        cfg = web_cfg or {}
+        return WebInput(host=str(cfg.get("host", "0.0.0.0")), port=int(cfg.get("port", 8000)))
     raise ValueError(f"Unknown input backend: {kind}")
 
 
-def build_output(kind: str, cfg: dict[str, Any], grid_size: int = 32) -> OutputBackend:
+def build_output(
+    kind: str, cfg: dict[str, Any], grid_size: int = 32, web_cfg: dict[str, Any] | None = None
+) -> OutputBackend:
     if kind == "pygame_window":
         return PygameWindowOutput(
             led_size=int(cfg.get("led_size", 16)),
@@ -57,6 +67,12 @@ def build_output(kind: str, cfg: dict[str, Any], grid_size: int = 32) -> OutputB
         return TerminalAsciiOutput(ansi_clear=bool(cfg.get("ansi_clear", True)))
     if kind in TUI_BACKENDS:
         return TerminalTuiOutput(show_grid=bool(cfg.get("show_grid", False)))
+    if kind in WEB_BACKENDS:
+        settings = web_cfg or {}
+        return WebOutput(
+            host=str(settings.get("host", "0.0.0.0")),
+            port=int(settings.get("port", 8000)),
+        )
     if kind == "ble_ipixel":
         return BleIPixelOutput(
             name_substring=cfg.get("name_substring"),
@@ -98,13 +114,14 @@ def main() -> None:
     input_kind = cfg.get("input", {}).get("backend", "keyboard_sim")
     output_kind = cfg.get("output", {}).get("backend", "pygame_window")
     scene_mode = cfg.get("gameplay", {}).get("mode", "color_toggle")
+    web_cfg = cfg.get("web", {})
     grid_size = args.grid_size or int(cfg.get("app", {}).get("grid_size", 32))
     if grid_size not in {8, 16, 32}:
         raise ValueError("grid_size must be one of: 8, 16, 32")
 
     validate_backend_pair(input_kind, output_kind)
-    input_backend = build_input(input_kind)
-    output_backend = build_output(output_kind, cfg.get("output", {}), grid_size)
+    input_backend = build_input(input_kind, web_cfg)
+    output_backend = build_output(output_kind, cfg.get("output", {}), grid_size, web_cfg)
 
     scenes = build_scenes(scene_mode)
     app = App(

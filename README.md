@@ -106,6 +106,16 @@ The Pygame preview supports the same values: `make run-dev GRID_SIZE=8` or
 `make run-dev GRID_SIZE=16`. Its window remains the same size, so each grid cell is
 automatically enlarged to fill it.
 
+### Run the web preview
+
+```bash
+make run-web
+```
+
+The server binds to port 8000 on every network interface. Open
+`http://<your-computer-LAN-IP>:8000` on your phone while it is on the same Wi-Fi.
+The browser provides the canvas, menu/status bars, keyboard support, and touch controls.
+
 ## Switching config/backends
 
 Edit `config.example.yaml` (or use `config.rpi.yaml` for Raspberry Pi defaults):
