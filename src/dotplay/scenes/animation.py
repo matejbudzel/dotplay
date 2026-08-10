@@ -47,11 +47,11 @@ class AnimationScene:
 
     @property
     def description(self) -> str:
-        return f"{self.animation_name} — Left/Right change animation"
+        return self.animation_name
 
     @property
     def help_lines(self) -> tuple[str, ...]:
-        return ("←/→: change animation", "R: reset animation")
+        return ("Left/Right: change animation", "R: reset animation")
 
     @property
     def animation_name(self) -> str:

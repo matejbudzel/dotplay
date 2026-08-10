@@ -88,15 +88,17 @@ class TerminalTuiOutput(OutputBackend):
         required_height = framebuffer.height + 1
         screen.erase()
         header = f"dotplay  •  {self.status}" if self.status else "dotplay"
+        help_text = "? help"
+        help_x = max(width - len(help_text) - 1, 0)
         self._write(
             screen,
             0,
             0,
-            self._ellipsize(header, max(width - 8, 0)),
+            self._ellipsize(header, max(help_x - 1, 0)),
             width,
             curses.A_REVERSE,
         )
-        self._write(screen, 0, max(width - 7, 0), "? help", width, curses.A_REVERSE)
+        self._write(screen, 0, help_x, help_text, width, curses.A_REVERSE)
         if width < required_width or height < required_height:
             message = (
                 f"Terminal too small: need {required_width}×{required_height}, "

@@ -65,11 +65,15 @@ class LightScene:
 
     @property
     def description(self) -> str:
-        return f"{self.hue_name} · {self.brightness}% · {self.style_name} · G changes style"
+        return f"{self.hue_name} · {self.brightness}% · {self.style_name}"
 
     @property
     def help_lines(self) -> tuple[str, ...]:
-        return ("←/→: hue    ↑/↓: brightness", "G: change gradient style", "R: reset light")
+        return (
+            "Left/Right: hue    Up/Down: brightness",
+            "G: change gradient style",
+            "R: reset light",
+        )
 
     @property
     def hue_name(self) -> str:

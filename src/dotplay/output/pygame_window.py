@@ -38,8 +38,11 @@ class PygameWindowOutput(OutputBackend):
             return
         self.surface.fill((12, 12, 16))
         header = f"dotplay  •  {self.status}" if self.status else "dotplay"
-        self._draw_text(header, 4, 5, max_width=self.surface.get_width() - 58)
-        self._draw_text("? help", self.surface.get_width() - 50, 5)
+        help_text = "? help"
+        help_width = self.font.size(help_text)[0]
+        help_x = self.surface.get_width() - help_width - 6
+        self._draw_text(header, 4, 5, max_width=help_x - 10)
+        self._draw_text(help_text, help_x, 5, max_width=help_width)
         for y in range(framebuffer.height):
             for x in range(framebuffer.width):
                 color = framebuffer.get_pixel(x, y)

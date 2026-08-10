@@ -10,10 +10,10 @@ from dotplay.types import Action, InputEvent
 @dataclass
 class ColorToggleScene:
     title: ClassVar[str] = "Test"
-    description: ClassVar[str] = "Press arrows to change grid color"
+    description: ClassVar[str] = "Grid color test"
     help_lines: ClassVar[tuple[str, ...]] = (
-        "←/A: red    →/D: blue",
-        "↑/W/Space: on    ↓/S: off",
+        "Left/A: red    Right/D: blue",
+        "Up/W/Space: on    Down/S: off",
         "R: reset",
     )
     is_on: bool = False

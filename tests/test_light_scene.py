@@ -9,7 +9,7 @@ def test_light_scene_defaults_to_half_brightness_white() -> None:
 
     scene.render(fb)
 
-    assert scene.description.startswith("White · 50% · Uniform")
+    assert scene.description == "White · 50% · Uniform"
     assert fb.get_pixel(0, 0) == (128, 128, 128)
     assert fb.get_pixel(7, 7) == (128, 128, 128)
 
