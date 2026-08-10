@@ -43,3 +43,18 @@ def test_fireplace_uses_a_multi_shade_flame_palette() -> None:
     colors = {color for row in fb.pixels for color in row}
     assert len(colors) > 8
     assert (255, 255, 245) in colors
+
+
+def test_fireplace_log_height_scales_with_the_grid() -> None:
+    log_colors = {(80, 35, 12), (120, 55, 15)}
+    for size, log_rows in ((8, 1), (16, 2), (32, 3)):
+        scene = AnimationScene(animation_index=2)
+        fb = FrameBuffer(width=size, height=size)
+        scene.update()
+        scene.render(fb)
+
+        assert all(
+            fb.get_pixel(x, y) in log_colors
+            for y in range(size - log_rows, size)
+            for x in range(size)
+        )

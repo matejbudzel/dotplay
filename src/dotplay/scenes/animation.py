@@ -122,17 +122,19 @@ class AnimationScene:
 
     def _render_fireplace(self, fb: FrameBuffer) -> None:
         fb.clear()
-        log_top = max(fb.height - 3, 0)
+        log_rows = 1 if fb.height <= 8 else 2 if fb.height <= 16 else 3
+        log_top = max(fb.height - log_rows, 0)
         for y in range(log_top, fb.height):
             for x in range(fb.width):
                 fb.set_pixel(x, y, (80, 35, 12) if (x + y) % 3 else (120, 55, 15))
 
         flame_base = max(log_top, 1)
         center = (fb.width - 1) / 2
+        flame_span, flame_scale = self._flame_shape(fb.height, flame_base)
         for x in range(fb.width):
             distance = abs(x - center) / max(fb.width / 2, 1)
             flicker = (sin(self.tick * 0.45 + x * 1.7) + 1) / 2
-            flame_height = int((1 - distance) * (flame_base - 1) * (0.65 + flicker * 0.45))
+            flame_height = int((1 - distance) * flame_span * (flame_scale + flicker * 0.35))
             for rise in range(flame_height):
                 y = flame_base - 1 - rise
                 if y < 0:
@@ -142,3 +144,11 @@ class AnimationScene:
                 heat = min(1.0, 0.2 + (1 - height_ratio) * 0.5 + core * 0.45)
                 palette_index = round(heat * (len(FLAME_PALETTE) - 1))
                 fb.set_pixel(x, y, FLAME_PALETTE[palette_index])
+
+    @staticmethod
+    def _flame_shape(height: int, flame_base: int) -> tuple[int, float]:
+        if height <= 8:
+            return flame_base, 0.85
+        if height <= 16:
+            return max(flame_base - 1, 1), 0.7
+        return max(flame_base - 1, 1), 0.65
