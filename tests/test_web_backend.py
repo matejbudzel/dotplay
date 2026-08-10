@@ -26,10 +26,11 @@ def test_web_session_serializes_frames_status_and_input_events() -> None:
     assert session.drain_events() == []
 
 
-def test_web_client_renders_each_pixel_with_grid_lines() -> None:
+def test_web_client_renders_led_cores_glow_and_grid_lines() -> None:
     assert "const cellSize = Math.max(1, Math.floor(512 / state.width))" in _PAGE
-    assert "ctx.fillRect" in _PAGE
-    assert "ctx.strokeRect" in _PAGE
+    assert "ctx.createRadialGradient" in _PAGE
+    assert "brightness * 52 / 255" in _PAGE
+    assert "ctx.lineTo" in _PAGE
 
 
 def test_web_client_has_no_quit_control() -> None:
