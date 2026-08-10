@@ -70,10 +70,14 @@ class TerminalTuiOutput(OutputBackend):
         self.session = session or TerminalTuiSession.shared()
         self.show_grid = show_grid
         self.status = ""
+        self.help_lines: list[str] | None = None
         self.session.start()
 
     def set_status(self, status: str) -> None:
         self.status = status
+
+    def set_help(self, lines: list[str] | None) -> None:
+        self.help_lines = lines
 
     def push(self, framebuffer: FrameBuffer) -> None:
         screen = self.session.screen
@@ -81,9 +85,18 @@ class TerminalTuiOutput(OutputBackend):
             return
         height, width = screen.getmaxyx()
         required_width = framebuffer.width * 2
-        required_height = framebuffer.height + 3
+        required_height = framebuffer.height + 1
         screen.erase()
-        self._write(screen, 0, 0, self._HEADER, width, curses.A_REVERSE)
+        header = f"dotplay  •  {self.status}" if self.status else "dotplay"
+        self._write(
+            screen,
+            0,
+            0,
+            self._ellipsize(header, max(width - 8, 0)),
+            width,
+            curses.A_REVERSE,
+        )
+        self._write(screen, 0, max(width - 7, 0), "? help", width, curses.A_REVERSE)
         if width < required_width or height < required_height:
             message = (
                 f"Terminal too small: need {required_width}×{required_height}, "
@@ -94,17 +107,9 @@ class TerminalTuiOutput(OutputBackend):
             return
         for y in range(framebuffer.height):
             for x in range(framebuffer.width):
-                self._draw_cell(screen, y + 2, x * 2, framebuffer.get_pixel(x, y))
-        dimensions = f"{framebuffer.width}×{framebuffer.height}"
-        footer = f"{dimensions}  •  {self.status}" if self.status else dimensions
-        self._write(
-            screen,
-            framebuffer.height + 2,
-            0,
-            self._ellipsize(footer, width - 1),
-            width,
-            curses.A_DIM,
-        )
+                self._draw_cell(screen, y + 1, x * 2, framebuffer.get_pixel(x, y))
+        if self.help_lines is not None:
+            self._draw_help(screen, width, height)
         screen.refresh()
 
     def _draw_cell(self, screen: curses.window, y: int, x: int, color: Color) -> None:
@@ -156,6 +161,25 @@ class TerminalTuiOutput(OutputBackend):
         else:
             pair = curses.COLOR_WHITE + 1
         return curses.color_pair(pair) | curses.A_BOLD
+
+    def _draw_help(self, screen: curses.window, width: int, height: int) -> None:
+        assert self.help_lines is not None
+        box_width = min(max(len(line) for line in self.help_lines) + 4, max(width - 4, 1))
+        box_height = min(len(self.help_lines) + 2, max(height - 2, 1))
+        start_x = max((width - box_width) // 2, 0)
+        start_y = max((height - box_height) // 2, 0)
+        for y in range(box_height):
+            self._write(screen, start_y + y, start_x, " " * box_width, width, curses.A_REVERSE)
+        for index, line in enumerate(self.help_lines[: box_height - 2]):
+            attributes = curses.A_BOLD | curses.A_REVERSE if index == 0 else curses.A_REVERSE
+            self._write(
+                screen,
+                start_y + index + 1,
+                start_x + 2,
+                line,
+                start_x + box_width,
+                attributes,
+            )
 
     @staticmethod
     def _write(

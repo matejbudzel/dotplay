@@ -18,6 +18,8 @@ DEFAULT_KEYMAP: dict[int, Action] = {
     114: Action.RESET,  # R
     109: Action.NEXT_MODE,  # M
     103: Action.NEXT_STYLE,  # G
+    47: Action.HELP,  # /
+    63: Action.HELP,  # ?
     113: Action.QUIT,  # Q
     49: Action.MODE_1,  # 1
     50: Action.MODE_2,  # 2
@@ -29,7 +31,7 @@ DEFAULT_KEYMAP: dict[int, Action] = {
     56: Action.MODE_8,  # 8
     57: Action.MODE_9,  # 9
     32: Action.HARD_DROP,  # Space
-    27: Action.QUIT,  # Esc
+    27: Action.ESCAPE,  # Esc
 }
 
 

@@ -21,6 +21,7 @@ class App:
     fps: int = 10
     grid_size: int = 32
     scenes: list[Scene] = field(default_factory=list)
+    help_visible: bool = False
 
     def __post_init__(self) -> None:
         if not self.scenes:
@@ -35,7 +36,17 @@ class App:
     def _scene_status(self) -> str:
         title = getattr(self.scene, "title", type(self.scene).__name__)
         description = getattr(self.scene, "description", "")
-        return f"{title}: {description}" if description else title
+        return f"{title} · {description}" if description else title
+
+    def _help_lines(self) -> list[str]:
+        scene_lines = list(getattr(self.scene, "help_lines", ()))
+        lines = [
+            "Controls",
+            *scene_lines,
+            "M: next mode    1–4: select mode",
+        ]
+        lines.append("Esc: close help" if self.help_visible else "?: show help    Q: quit")
+        return lines
 
     def run(self, max_ticks: int | None = None) -> None:
         fb = FrameBuffer(width=self.grid_size, height=self.grid_size)
@@ -46,7 +57,16 @@ class App:
             start = time.monotonic()
             events = self.input_backend.poll()
             for event in events:
-                if event.action == Action.QUIT:
+                if event.action == Action.ESCAPE:
+                    if self.help_visible:
+                        self.help_visible = False
+                    else:
+                        running = False
+                elif self.help_visible:
+                    continue
+                elif event.action == Action.HELP:
+                    self.help_visible = True
+                elif event.action == Action.QUIT:
                     running = False
                 elif event.action == Action.NEXT_MODE:
                     self._switch_scene(self.scenes.index(self.scene) + 1)
@@ -61,6 +81,7 @@ class App:
             self.scene.update()
             self.scene.render(fb)
             self.output_backend.set_status(self._scene_status())
+            self.output_backend.set_help(self._help_lines() if self.help_visible else None)
             self.output_backend.push(fb)
             tick += 1
             if max_ticks is not None and tick >= max_ticks:

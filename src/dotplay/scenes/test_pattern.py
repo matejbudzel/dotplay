@@ -11,6 +11,7 @@ from dotplay.types import InputEvent
 class PatternScene:
     title: ClassVar[str] = "Pattern"
     description: ClassVar[str] = "Animated checkerboard test pattern"
+    help_lines: ClassVar[tuple[str, ...]] = ("R: reset animation",)
     tick: int = 0
 
     def handle_event(self, event: InputEvent) -> None:

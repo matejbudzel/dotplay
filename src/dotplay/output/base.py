@@ -14,6 +14,10 @@ class OutputBackend(ABC):
         """Receive optional scene status for backends that can display text."""
         _ = status
 
+    def set_help(self, lines: list[str] | None) -> None:
+        """Receive optional context-sensitive help for text-capable backends."""
+        _ = lines
+
     def close(self) -> None:
         """Release resources."""
         return None

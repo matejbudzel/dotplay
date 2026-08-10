@@ -17,6 +17,8 @@ def test_terminal_tui_keymap_supports_arrows_and_game_keys() -> None:
     assert action_for_key(ord("m")) is Action.NEXT_MODE
     assert action_for_key(ord("3")) is Action.MODE_3
     assert action_for_key(ord("q")) is Action.QUIT
+    assert action_for_key(ord("?")) is Action.HELP
+    assert action_for_key(27) is Action.ESCAPE
 
 
 def test_terminal_tui_ignores_unmapped_keys() -> None:

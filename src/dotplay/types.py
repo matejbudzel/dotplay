@@ -17,6 +17,8 @@ class Action(StrEnum):
     RESET = "reset"
     PAUSE = "pause"
     NEXT_STYLE = "next_style"
+    HELP = "help"
+    ESCAPE = "escape"
     NEXT_MODE = "next_mode"
     MODE_1 = "mode_1"
     MODE_2 = "mode_2"

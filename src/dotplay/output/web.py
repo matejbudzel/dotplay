@@ -22,28 +22,34 @@ _PAGE = """<!doctype html>
 <title>dotplay</title><style>
 :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111217; color: #e8e8ef; }
 body { margin: 0; display: grid; justify-items: center; gap: 12px; padding: 14px; }
-#menu, #status { width: min(92vw, 512px); font-size: 14px; color: #cfd0da; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#menu { width: min(92vw, 512px); font-size: 14px; color: #cfd0da; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 canvas { width: min(92vw, 512px); aspect-ratio: 1; image-rendering: pixelated; background: #000; border: 1px solid #333541; }
 #controls { width: min(92vw, 512px); display: grid; gap: 8px; }
 .row { display: flex; justify-content: center; gap: 8px; }
 button { min-width: 48px; min-height: 44px; border: 1px solid #464957; border-radius: 8px; background: #292b35; color: inherit; font-size: 18px; touch-action: manipulation; }
 button:active { background: #565a6c; }
+#help { position: fixed; inset: 0; display: none; place-items: center; background: #0009; padding: 20px; }
+#help.visible { display: grid; }
+#help-box { min-width: min(80vw, 340px); max-width: 90vw; padding: 18px; border: 1px solid #606575; border-radius: 10px; background: #1c1e27; }
+#help-lines { display: grid; gap: 10px; white-space: pre-wrap; }
 </style></head><body>
-<div id="menu">dotplay · M next mode · 1–9 select mode · G next style</div>
-<canvas id="grid" width="32" height="32"></canvas><div id="status">Connecting…</div>
+<div id="menu">dotplay</div>
+<canvas id="grid" width="32" height="32"></canvas>
 <div id="controls">
-<div class="row"><button data-action="mode_1">1</button><button data-action="mode_2">2</button><button data-action="mode_3">3</button><button data-action="mode_4">4</button><button data-action="next_mode">M</button><button data-action="next_style">G</button></div>
+<div class="row"><button data-action="mode_1">1</button><button data-action="mode_2">2</button><button data-action="mode_3">3</button><button data-action="mode_4">4</button><button data-action="next_mode">M</button><button data-action="next_style">G</button><button data-action="help">?</button></div>
 <div class="row"><button data-action="up">↑</button></div>
 <div class="row"><button data-action="left">←</button><button data-action="hard_drop">●</button><button data-action="right">→</button></div>
 <div class="row"><button data-action="down">↓</button><button data-action="reset">R</button></div>
 </div>
+<div id="help"><div id="help-box"><div id="help-lines"></div><div class="row"><button data-action="escape">Esc</button></div></div></div>
 <script>
-const canvas = document.querySelector('#grid'), ctx = canvas.getContext('2d'), status = document.querySelector('#status');
+const canvas = document.querySelector('#grid'), ctx = canvas.getContext('2d'), menu = document.querySelector('#menu'), help = document.querySelector('#help'), helpLines = document.querySelector('#help-lines');
 const send = action => fetch('/input', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action})});
 document.querySelectorAll('button').forEach(button => button.addEventListener('click', () => send(button.dataset.action)));
-const keys = {ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down', ' ':'hard_drop', r:'reset', m:'next_mode', g:'next_style', 1:'mode_1', 2:'mode_2', 3:'mode_3', 4:'mode_4', 5:'mode_5', 6:'mode_6', 7:'mode_7', 8:'mode_8', 9:'mode_9'};
-addEventListener('keydown', event => { const action = keys[event.key]; if (action) { event.preventDefault(); send(action); } });
-async function refresh() { try { const response = await fetch('/state', {cache:'no-store'}); if (!response.ok) throw new Error(`state request: ${response.status}`); const state = await response.json(); if (!state.pixels) return; const cellSize = Math.max(1, Math.floor(512 / state.width)); if (canvas.width !== state.width * cellSize) { canvas.width = state.width * cellSize; canvas.height = state.height * cellSize; } const rgb = atob(state.pixels); for (let y = 0, source = 0; y < state.height; y++) { for (let x = 0; x < state.width; x++, source += 3) { ctx.fillStyle = `rgb(${rgb.charCodeAt(source)}, ${rgb.charCodeAt(source + 1)}, ${rgb.charCodeAt(source + 2)})`; ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize); ctx.strokeStyle = '#252733'; ctx.strokeRect(x * cellSize + .5, y * cellSize + .5, cellSize - 1, cellSize - 1); } } status.textContent = `${state.width}×${state.height}  •  ${state.status || ''}`; } catch (error) { status.textContent = `Connection error: ${error.message || 'reconnecting'}`; } }
+const keys = {ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down', Escape:'escape', '?':'help', ' ':'hard_drop', r:'reset', m:'next_mode', g:'next_style', 1:'mode_1', 2:'mode_2', 3:'mode_3', 4:'mode_4', 5:'mode_5', 6:'mode_6', 7:'mode_7', 8:'mode_8', 9:'mode_9'};
+addEventListener('keydown', event => { const action = keys[event.key]; if (action && (action !== 'escape' || help.classList.contains('visible'))) { event.preventDefault(); send(action); } });
+function renderHelp(lines) { helpLines.replaceChildren(...(lines || []).map(line => { const node = document.createElement('div'); node.textContent = line; return node; })); help.classList.toggle('visible', Boolean(lines)); }
+async function refresh() { try { const response = await fetch('/state', {cache:'no-store'}); if (!response.ok) throw new Error(`state request: ${response.status}`); const state = await response.json(); if (!state.pixels) return; const cellSize = Math.max(1, Math.floor(512 / state.width)); if (canvas.width !== state.width * cellSize) { canvas.width = state.width * cellSize; canvas.height = state.height * cellSize; } const rgb = atob(state.pixels); for (let y = 0, source = 0; y < state.height; y++) { for (let x = 0; x < state.width; x++, source += 3) { ctx.fillStyle = `rgb(${rgb.charCodeAt(source)}, ${rgb.charCodeAt(source + 1)}, ${rgb.charCodeAt(source + 2)})`; ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize); ctx.strokeStyle = '#252733'; ctx.strokeRect(x * cellSize + .5, y * cellSize + .5, cellSize - 1, cellSize - 1); } } menu.textContent = `dotplay  •  ${state.status || ''}`; renderHelp(state.help); } catch (error) { menu.textContent = `Connection error: ${error.message || 'reconnecting'}`; } }
 setInterval(refresh, 75); refresh();
 </script></body></html>"""
 
@@ -62,6 +68,7 @@ class WebSession:
         self._width = 0
         self._height = 0
         self._status = ""
+        self._help: list[str] | None = None
         self._server: ThreadingHTTPServer | None = None
         self._thread: threading.Thread | None = None
 
@@ -115,6 +122,10 @@ class WebSession:
         with self._lock:
             self._status = status
 
+    def set_help(self, lines: list[str] | None) -> None:
+        with self._lock:
+            self._help = lines
+
     def snapshot(self) -> dict[str, object]:
         with self._lock:
             return {
@@ -122,6 +133,7 @@ class WebSession:
                 "height": self._height,
                 "pixels": base64.b64encode(self._pixels).decode("ascii"),
                 "status": self._status,
+                "help": self._help,
             }
 
     def add_event(self, event: InputEvent) -> None:
@@ -146,6 +158,9 @@ class WebOutput(OutputBackend):
 
     def set_status(self, status: str) -> None:
         self.session.set_status(status)
+
+    def set_help(self, lines: list[str] | None) -> None:
+        self.session.set_help(lines)
 
     def push(self, framebuffer: FrameBuffer) -> None:
         self.session.update_frame(framebuffer)

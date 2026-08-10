@@ -25,12 +25,16 @@ class FakeInputBackend(InputBackend):
 class FakeOutputBackend(OutputBackend):
     frames: list[bytes] = field(default_factory=list)
     statuses: list[str] = field(default_factory=list)
+    help_frames: list[list[str] | None] = field(default_factory=list)
 
     def push(self, framebuffer: FrameBuffer) -> None:
         self.frames.append(framebuffer.to_bytes())
 
     def set_status(self, status: str) -> None:
         self.statuses.append(status)
+
+    def set_help(self, lines: list[str] | None) -> None:
+        self.help_frames.append(lines)
 
 
 class NullOutputBackend(OutputBackend):

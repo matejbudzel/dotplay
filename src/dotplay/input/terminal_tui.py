@@ -19,6 +19,7 @@ KEYMAP: dict[int, Action] = {
     ord("r"): Action.RESET,
     ord("p"): Action.PAUSE,
     ord("g"): Action.NEXT_STYLE,
+    ord("?"): Action.HELP,
     ord("m"): Action.NEXT_MODE,
     ord("1"): Action.MODE_1,
     ord("2"): Action.MODE_2,
@@ -30,7 +31,7 @@ KEYMAP: dict[int, Action] = {
     ord("8"): Action.MODE_8,
     ord("9"): Action.MODE_9,
     ord("q"): Action.QUIT,
-    27: Action.QUIT,
+    27: Action.ESCAPE,
 }
 
 

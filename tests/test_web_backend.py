@@ -37,6 +37,13 @@ def test_web_client_has_no_quit_control() -> None:
     assert "q:'quit'" not in _PAGE
 
 
+def test_web_client_shows_help_as_a_modal() -> None:
+    assert 'data-action="help"' in _PAGE
+    assert 'data-action="escape"' in _PAGE
+    assert "renderHelp(state.help)" in _PAGE
+    assert "help.classList.contains('visible')" in _PAGE
+
+
 def test_web_session_serves_state_and_accepts_browser_input() -> None:
     session = WebSession(host="127.0.0.1", port=0)
     try:
