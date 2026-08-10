@@ -1,0 +1,21 @@
+app:
+  fps: 10
+  max_ticks: null
+  grid_size: 32
+
+input:
+  backend: keyboard_sim
+
+output:
+  backend: pygame_window
+  led_size: 16
+  show_grid: true
+
+logging:
+  level: INFO
+
+dev:
+  use_snapshots: true
+
+gameplay:
+  mode: color_toggle

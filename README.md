@@ -37,6 +37,9 @@ make format
 make typecheck
 ```
 
+`make run-dev` uses `config.dev.yaml` and runs until you quit. `config.example.yaml`
+keeps a bounded tick count for quick demos and automated checks.
+
 ## First app demo: color toggle controls
 
 Default scene is `color_toggle`.
