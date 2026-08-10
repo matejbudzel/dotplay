@@ -34,4 +34,5 @@ def test_scene_shortcuts_have_a_stable_order() -> None:
         "ColorToggleScene",
         "PatternScene",
         "AnimationScene",
+        "LightScene",
     ]

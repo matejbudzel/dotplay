@@ -33,7 +33,11 @@ class PygameWindowOutput(OutputBackend):
         if pygame is None:
             return
         self.surface.fill((12, 12, 16))
-        self._draw_text("dotplay  •  M: next mode  •  1–9: select mode  •  Q/Esc: quit", 4, 5)
+        self._draw_text(
+            "dotplay  •  M: next mode  •  1–9: select mode  •  G: next style  •  Q/Esc: quit",
+            4,
+            5,
+        )
         for y in range(framebuffer.height):
             for x in range(framebuffer.width):
                 color = framebuffer.get_pixel(x, y)

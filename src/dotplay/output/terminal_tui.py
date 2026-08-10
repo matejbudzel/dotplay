@@ -64,7 +64,7 @@ class TerminalTuiSession:
 class TerminalTuiOutput(OutputBackend):
     """Curses renderer that presents the framebuffer as an interactive grid."""
 
-    _HEADER = "dotplay  •  M next mode  •  1–9 select mode  •  Q quit"
+    _HEADER = "dotplay  •  M next mode  •  1–9 select mode  •  G next style  •  Q quit"
 
     def __init__(self, session: TerminalTuiSession | None = None, show_grid: bool = False) -> None:
         self.session = session or TerminalTuiSession.shared()

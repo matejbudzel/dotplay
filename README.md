@@ -76,8 +76,9 @@ accepted as a shorter backend alias.
 
 Press **M** to cycle between mini-app modes, or use **1**–**9** to select one directly.
 The footer shows the active mode and its short control hint. The bundled modes are Test,
-Pattern, and Animation; within Animation, use Left/Right to switch between Fireworks and
-Waves.
+Pattern, Animation, and Light. Within Animation, use Left/Right to switch between
+Fireworks, Waves, and Fireplace. In Light mode, Left/Right changes hue, Up/Down changes
+brightness, and G cycles uniform, circular, vertical, and diagonal gradient styles.
 
 ### Run the terminal UI
 

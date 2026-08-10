@@ -16,6 +16,7 @@ class Action(StrEnum):
     CANCEL = "cancel"
     RESET = "reset"
     PAUSE = "pause"
+    NEXT_STYLE = "next_style"
     NEXT_MODE = "next_mode"
     MODE_1 = "mode_1"
     MODE_2 = "mode_2"

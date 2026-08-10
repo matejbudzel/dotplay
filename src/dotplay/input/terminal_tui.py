@@ -18,6 +18,7 @@ KEYMAP: dict[int, Action] = {
     ord(" "): Action.HARD_DROP,
     ord("r"): Action.RESET,
     ord("p"): Action.PAUSE,
+    ord("g"): Action.NEXT_STYLE,
     ord("m"): Action.NEXT_MODE,
     ord("1"): Action.MODE_1,
     ord("2"): Action.MODE_2,
