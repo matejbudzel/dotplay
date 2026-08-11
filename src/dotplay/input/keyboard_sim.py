@@ -14,10 +14,12 @@ DEFAULT_KEYMAP: dict[int, Action] = {
     97: Action.LEFT,  # A
     100: Action.RIGHT,  # D
     119: Action.ROTATE,  # W
-    115: Action.SOFT_DROP,  # S
+    115: Action.SHOW_SCORE,  # S
     114: Action.RESET,  # R
     109: Action.NEXT_MODE,  # M
     103: Action.NEXT_STYLE,  # G
+    99: Action.SHOW_CARD,  # C
+    112: Action.SHOW_PLAYER,  # P
     47: Action.HELP,  # /
     63: Action.HELP,  # ?
     113: Action.QUIT,  # Q

@@ -22,11 +22,13 @@ from dotplay.scenes.animation import AnimationScene
 from dotplay.scenes.base import Scene
 from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.light import LightScene
+from dotplay.scenes.memo import MemoScene
+from dotplay.scenes.pattern_preview import PatternPreviewScene
 from dotplay.scenes.test_pattern import PatternScene
 
 TUI_BACKENDS = {"terminal_tui", "tui"}
 WEB_BACKENDS = {"web"}
-SCENE_MODES = ("color_toggle", "test_pattern", "animation", "light")
+SCENE_MODES = ("color_toggle", "test_pattern", "animation", "light", "memo", "patterns")
 
 
 def validate_backend_pair(input_kind: str, output_kind: str) -> None:
@@ -93,13 +95,24 @@ def build_scene(mode: str) -> Scene:
         return AnimationScene()
     if mode == "light":
         return LightScene()
+    if mode == "memo":
+        return MemoScene()
+    if mode == "patterns":
+        return PatternPreviewScene()
     raise ValueError(f"Unknown scene mode: {mode}")
 
 
 def build_scenes(initial_mode: str) -> list[Scene]:
     if initial_mode not in SCENE_MODES:
         raise ValueError(f"Unknown scene mode: {initial_mode}")
-    return [ColorToggleScene(), PatternScene(), AnimationScene(), LightScene()]
+    return [
+        ColorToggleScene(),
+        PatternScene(),
+        AnimationScene(),
+        LightScene(),
+        MemoScene(),
+        PatternPreviewScene(),
+    ]
 
 
 def main() -> None:

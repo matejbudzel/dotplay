@@ -43,7 +43,7 @@ class App:
         lines = [
             "Controls",
             *scene_lines,
-            "M: next mode    1–4: select mode",
+            "M: next mode    1–6: select mode",
         ]
         lines.append("Esc: close help" if self.help_visible else "?: show help    Q: quit")
         return lines
@@ -60,6 +60,8 @@ class App:
                 if event.action == Action.ESCAPE:
                     if self.help_visible:
                         self.help_visible = False
+                    elif getattr(self.scene, "captures_escape", False):
+                        self.scene.handle_event(event)
                     else:
                         running = False
                 elif self.help_visible:
