@@ -89,7 +89,11 @@ class App:
                     self.scene.reset()
                 else:
                     self.scene.handle_event(event)
-            self.scene.update()
+            update_with_delta = getattr(self.scene, "update_with_delta", None)
+            if callable(update_with_delta):
+                update_with_delta(frame_time)
+            else:
+                self.scene.update()
             self.scene.render(fb)
             self.output_backend.set_status(self._scene_status())
             self.output_backend.set_help(self._help_lines() if self.help_visible else None)

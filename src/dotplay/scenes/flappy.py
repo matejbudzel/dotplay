@@ -19,8 +19,19 @@ WORLD_SIZE = 256
 CELL_SIZE = WORLD_SIZE // 8
 BIRD_X = CELL_SIZE * 3 // 2
 BIRD_SIZE = CELL_SIZE
+BIRD_COLLISION_HEIGHT = CELL_SIZE * 3 // 4
 PIPE_WIDTH = CELL_SIZE
-GAP_HEIGHT = CELL_SIZE * 3
+GAP_HEIGHTS = (CELL_SIZE * 3, CELL_SIZE * 4)
+MAX_GAP_CENTER_SHIFT = CELL_SIZE * 2
+
+SIMULATION_HZ = 60
+SIMULATION_STEP = 1 / SIMULATION_HZ
+DEFAULT_FRAME_TIME = 1 / 15
+GRAVITY = 350.0
+FLAP_VELOCITY = -185.0
+MAX_FALL_SPEED = 180.0
+PIPE_SPEED = 76.8
+OBSTACLE_INTERVAL = 1.6
 
 GLYPHS: dict[str, tuple[str, ...]] = {
     "0": ("111", "101", "101", "101", "111"),
@@ -40,6 +51,7 @@ GLYPHS: dict[str, tuple[str, ...]] = {
 class Obstacle:
     x: float
     gap_top: int
+    gap_height: int = CELL_SIZE * 3
     passed: bool = False
 
 
@@ -53,14 +65,17 @@ class FlappyScene:
     tick: int = 0
     game_over: bool = False
     obstacles: list[Obstacle] = field(default_factory=list)
-    next_obstacle_tick: int = 24
+    elapsed: float = 0.0
+    next_obstacle_at: float = OBSTACLE_INTERVAL
+    _accumulator: float = field(default=0.0, repr=False)
+    _last_gap_center: float | None = field(default=None, repr=False)
     _random: Random = field(default_factory=lambda: Random(0), repr=False)
 
     title: str = "Flappy"
 
     def __post_init__(self) -> None:
         if not self.obstacles:
-            self.obstacles.append(Obstacle(CELL_SIZE * 8.5, self._next_gap_top()))
+            self.obstacles.append(self._new_obstacle())
 
     @property
     def description(self) -> str:
@@ -80,41 +95,59 @@ class FlappyScene:
         self.tick = 0
         self.game_over = False
         self._random = Random(0)
-        self.obstacles = [Obstacle(CELL_SIZE * 8.5, self._next_gap_top())]
-        self.next_obstacle_tick = 24
+        self._last_gap_center = None
+        self.obstacles = [self._new_obstacle()]
+        self.elapsed = 0.0
+        self.next_obstacle_at = OBSTACLE_INTERVAL
+        self._accumulator = 0.0
 
     def handle_event(self, event: InputEvent) -> None:
         if event.action == Action.HARD_DROP:
             if self.game_over:
                 self.reset()
             else:
-                self.velocity = -0.48 * CELL_SIZE
+                self.velocity = FLAP_VELOCITY
 
     def update(self) -> None:
+        """Advance one default frame when the scene is used outside the app loop."""
+        self.update_with_delta(DEFAULT_FRAME_TIME)
+
+    def update_with_delta(self, elapsed: float) -> None:
+        """Advance deterministic 60 Hz physics independently of renderer frame rate."""
+        self._accumulator += min(max(elapsed, 0.0), 0.25)
+        while self._accumulator >= SIMULATION_STEP:
+            self._accumulator -= SIMULATION_STEP
+            self._simulate_step()
+
+    def _simulate_step(self) -> None:
         self.tick += 1
         if self.game_over:
             return
 
-        self.velocity = min(self.velocity + 0.055 * CELL_SIZE, 0.42 * CELL_SIZE)
-        self.bird_y += self.velocity
+        self.elapsed += SIMULATION_STEP
+        self.velocity = min(self.velocity + GRAVITY * SIMULATION_STEP, MAX_FALL_SPEED)
+        self.bird_y += self.velocity * SIMULATION_STEP
         if self.bird_y < 0 or self.bird_y + BIRD_SIZE > WORLD_SIZE:
             self.game_over = True
             return
 
         for obstacle in self.obstacles:
-            obstacle.x -= 0.16 * CELL_SIZE
+            obstacle.x -= PIPE_SPEED * SIMULATION_STEP
             if not obstacle.passed and obstacle.x + PIPE_WIDTH < BIRD_X:
                 obstacle.passed = True
                 self.score += 1
             if obstacle.x < BIRD_X + BIRD_SIZE and obstacle.x + PIPE_WIDTH > BIRD_X:
-                gap_bottom = obstacle.gap_top + GAP_HEIGHT
-                if self.bird_y < obstacle.gap_top or self.bird_y + BIRD_SIZE > gap_bottom:
+                gap_bottom = obstacle.gap_top + obstacle.gap_height
+                if (
+                    self.bird_y < obstacle.gap_top
+                    or self.bird_y + BIRD_COLLISION_HEIGHT > gap_bottom
+                ):
                     self.game_over = True
 
         self.obstacles = [obstacle for obstacle in self.obstacles if obstacle.x > -1]
-        if self.tick >= self.next_obstacle_tick:
-            self.obstacles.append(Obstacle(CELL_SIZE * 8.5, self._next_gap_top()))
-            self.next_obstacle_tick += 24
+        if self.elapsed >= self.next_obstacle_at:
+            self.obstacles.append(self._new_obstacle())
+            self.next_obstacle_at += OBSTACLE_INTERVAL
 
     def render(self, fb: FrameBuffer) -> None:
         self._paint_sky(fb)
@@ -127,15 +160,24 @@ class FlappyScene:
         if fb.width >= 32:
             self._draw_score(fb, self.score, fb.width - 1, 1, 1, right_aligned=True)
 
-    def _next_gap_top(self) -> int:
-        return self._random.randrange(1, 5) * CELL_SIZE
+    def _new_obstacle(self) -> Obstacle:
+        gap_height = self._random.choice(GAP_HEIGHTS)
+        candidates = tuple(
+            gap_top
+            for gap_top in range(CELL_SIZE, WORLD_SIZE - gap_height, CELL_SIZE)
+            if self._last_gap_center is None
+            or abs(gap_top + gap_height / 2 - self._last_gap_center) <= MAX_GAP_CENTER_SHIFT
+        )
+        gap_top = self._random.choice(candidates)
+        self._last_gap_center = gap_top + gap_height / 2
+        return Obstacle(CELL_SIZE * 8.5, gap_top, gap_height)
 
     def _render_obstacle(self, fb: FrameBuffer, obstacle: Obstacle) -> None:
         scale = fb.width / WORLD_SIZE
         left = round(obstacle.x * scale)
         right = max(left + 1, round((obstacle.x + PIPE_WIDTH) * scale))
         gap_top = obstacle.gap_top * scale
-        gap_bottom = (obstacle.gap_top + GAP_HEIGHT) * scale
+        gap_bottom = (obstacle.gap_top + obstacle.gap_height) * scale
         self._draw_pipe(fb, left, right, 0, round(gap_top), cap_at_end=True)
         self._draw_pipe(fb, left, right, round(gap_bottom), fb.height, cap_at_end=False)
 
