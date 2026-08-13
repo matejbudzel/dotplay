@@ -206,12 +206,12 @@ class NetworkStatusScene:
 
     def _render_small_marquee(self, fb: FrameBuffer) -> None:
         parts = self._small_parts()
-        self._draw_marquee(fb, 1, parts, speed_divisor=2)
+        self._draw_marquee(fb, 0, parts, speed_divisor=2)
 
     def _render_medium_marquee(self, fb: FrameBuffer) -> None:
         first, second = self._medium_parts()
-        self._draw_marquee(fb, 1, first, speed_divisor=2)
-        self._draw_marquee(fb, 9, second, speed_divisor=2, phase_offset=23)
+        self._draw_marquee(fb, 0, first, speed_divisor=2)
+        self._draw_marquee(fb, 8, second, speed_divisor=2, phase_offset=23)
 
     def _render_large_status(self, fb: FrameBuffer) -> None:
         detail_label, detail_value, detail_color = (
@@ -313,7 +313,7 @@ class NetworkStatusScene:
     @staticmethod
     def _draw_text(fb: FrameBuffer, x: int, y: int, text: str, color: Color) -> None:
         for index, char in enumerate(text):
-            glyph = FONT_5X6.get(char, FONT_5X6.get(char.upper(), FONT_5X6[" "]))
+            glyph = FONT_5X8.get(char, FONT_5X8.get(char.upper(), FONT_5X8[" "]))
             for row, bits in enumerate(glyph):
                 for column, bit in enumerate(bits):
                     if bit == "1":

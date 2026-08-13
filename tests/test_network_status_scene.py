@@ -1,6 +1,5 @@
 from dotplay.core.framebuffer import FrameBuffer
 from dotplay.scenes.network_status import (
-    FONT_5X6,
     FONT_5X8,
     PASSWORD_VALUE,
     SSID_VALUE,
@@ -19,15 +18,23 @@ def test_network_status_toggles_between_ap_and_client() -> None:
     assert scene.ssid == scene.network_name
 
 
-def test_network_status_uses_five_pixel_wide_six_and_eight_pixel_tall_fonts() -> None:
-    assert all(
-        len(glyph) == 6 and all(len(row) == 5 for row in glyph)
-        for glyph in FONT_5X6.values()
-    )
+def test_network_status_uses_a_five_pixel_wide_eight_pixel_tall_font() -> None:
     assert all(
         len(glyph) == 8 and all(len(row) == 5 for row in glyph)
         for glyph in FONT_5X8.values()
     )
+
+
+def test_network_status_uses_the_full_height_for_small_and_medium_marquees() -> None:
+    scene = NetworkStatusScene(tick=10)
+    small = FrameBuffer(width=8, height=8)
+    medium = FrameBuffer(width=16, height=16)
+    scene.render(small)
+    scene.render(medium)
+
+    assert any(pixel != (0, 0, 0) for pixel in small.pixels[0])
+    assert any(pixel != (0, 0, 0) for pixel in medium.pixels[0])
+    assert any(pixel != (0, 0, 0) for pixel in medium.pixels[8])
 
 
 def test_network_status_marquee_travels_fully_across_small_display() -> None:
