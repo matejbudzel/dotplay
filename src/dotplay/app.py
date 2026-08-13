@@ -12,6 +12,12 @@ from dotplay.types import Action
 
 logger = logging.getLogger(__name__)
 
+GRID_SIZE_ACTIONS = {
+    Action.GRID_SIZE_8: 8,
+    Action.GRID_SIZE_16: 16,
+    Action.GRID_SIZE_32: 32,
+}
+
 
 @dataclass
 class App:
@@ -76,6 +82,9 @@ class App:
                     mode_index = int(event.action.value.removeprefix("mode_")) - 1
                     if mode_index < len(self.scenes):
                         self._switch_scene(mode_index)
+                elif event.action in GRID_SIZE_ACTIONS:
+                    self.grid_size = GRID_SIZE_ACTIONS[event.action]
+                    fb = FrameBuffer(width=self.grid_size, height=self.grid_size)
                 elif event.action == Action.RESET:
                     self.scene.reset()
                 else:

@@ -20,6 +20,24 @@ def test_app_loop_uses_configured_grid_size() -> None:
     assert len(out.frames[0]) == 8 * 8 * 3
 
 
+def test_app_switches_grid_size_without_resetting_the_running_scene() -> None:
+    scene = PatternScene()
+    inp = FakeInputBackend(
+        batches=[
+            [InputEvent(Action.GRID_SIZE_8)],
+            [InputEvent(Action.GRID_SIZE_16)],
+            [InputEvent(Action.QUIT)],
+        ]
+    )
+    out = FakeOutputBackend()
+    app = App(input_backend=inp, output_backend=out, scene=scene, fps=120)
+    app.run(max_ticks=4)
+
+    assert len(out.frames[0]) == 8 * 8 * 3
+    assert len(out.frames[1]) == 16 * 16 * 3
+    assert scene.tick == 3
+
+
 def test_app_switches_to_next_scene_and_sets_status() -> None:
     initial = PatternScene()
     next_scene = PatternScene(tick=10)

@@ -38,6 +38,13 @@ def test_web_client_has_no_quit_control() -> None:
     assert "q:'quit'" not in _PAGE
 
 
+def test_web_client_offers_live_grid_size_controls() -> None:
+    assert 'data-action="grid_size_8"' in _PAGE
+    assert 'data-action="grid_size_16"' in _PAGE
+    assert 'data-action="grid_size_32"' in _PAGE
+    assert "button.dataset.gridSize" in _PAGE
+
+
 def test_web_client_shows_help_as_a_modal() -> None:
     assert 'data-action="help"' in _PAGE
     assert 'data-action="escape"' in _PAGE

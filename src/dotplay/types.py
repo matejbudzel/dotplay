@@ -32,6 +32,9 @@ class Action(StrEnum):
     MODE_7 = "mode_7"
     MODE_8 = "mode_8"
     MODE_9 = "mode_9"
+    GRID_SIZE_8 = "grid_size_8"
+    GRID_SIZE_16 = "grid_size_16"
+    GRID_SIZE_32 = "grid_size_32"
     QUIT = "quit"
 
 
