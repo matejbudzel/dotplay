@@ -24,12 +24,15 @@ from dotplay.scenes.color_toggle import ColorToggleScene
 from dotplay.scenes.flappy import FlappyScene
 from dotplay.scenes.light import LightScene
 from dotplay.scenes.memo import MemoScene
+from dotplay.scenes.network_status import NetworkStatusScene
 from dotplay.scenes.pattern_preview import PatternPreviewScene
 from dotplay.scenes.test_pattern import PatternScene
 
 TUI_BACKENDS = {"terminal_tui", "tui"}
 WEB_BACKENDS = {"web"}
-SCENE_MODES = ("color_toggle", "test_pattern", "animation", "light", "memo", "patterns", "flappy")
+SCENE_MODES = (
+    "color_toggle", "test_pattern", "animation", "light", "memo", "patterns", "flappy", "network"
+)
 
 
 def validate_backend_pair(input_kind: str, output_kind: str) -> None:
@@ -102,6 +105,8 @@ def build_scene(mode: str) -> Scene:
         return PatternPreviewScene()
     if mode == "flappy":
         return FlappyScene()
+    if mode == "network":
+        return NetworkStatusScene()
     raise ValueError(f"Unknown scene mode: {mode}")
 
 
@@ -116,6 +121,7 @@ def build_scenes(initial_mode: str) -> list[Scene]:
         MemoScene(),
         PatternPreviewScene(),
         FlappyScene(),
+        NetworkStatusScene(),
     ]
 
 
