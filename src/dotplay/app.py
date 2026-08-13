@@ -43,7 +43,7 @@ class App:
         lines = [
             "Controls",
             *scene_lines,
-            "M: next mode    1–6: select mode",
+            "M: next mode    1–7: select mode",
         ]
         lines.append("Esc: close help" if self.help_visible else "?: show help    Q: quit")
         return lines

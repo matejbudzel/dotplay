@@ -20,6 +20,13 @@ FLAME_PALETTE: tuple[Color, ...] = (
     (255, 248, 205),
     (255, 255, 245),
 )
+MATRIX_TRAIL: tuple[Color, ...] = (
+    (8, 28, 12),
+    (12, 65, 24),
+    (20, 120, 42),
+    (45, 205, 80),
+    (180, 255, 190),
+)
 
 
 @dataclass(frozen=True)
@@ -55,7 +62,7 @@ class AnimationScene:
 
     @property
     def animation_name(self) -> str:
-        return ("Fireworks", "Waves", "Fireplace")[self.animation_index]
+        return ("Fireworks", "Waves", "Fireplace", "Matrix rain")[self.animation_index]
 
     def reset(self) -> None:
         self.tick = 0
@@ -65,9 +72,9 @@ class AnimationScene:
 
     def handle_event(self, event: InputEvent) -> None:
         if event.action == Action.LEFT:
-            self.animation_index = (self.animation_index - 1) % 3
+            self.animation_index = (self.animation_index - 1) % 4
         elif event.action == Action.RIGHT:
-            self.animation_index = (self.animation_index + 1) % 3
+            self.animation_index = (self.animation_index + 1) % 4
 
     def update(self) -> None:
         self.tick += 1
@@ -77,8 +84,10 @@ class AnimationScene:
             self._render_fireworks(fb)
         elif self.animation_index == 1:
             self._render_waves(fb)
-        else:
+        elif self.animation_index == 2:
             self._render_fireplace(fb)
+        else:
+            self._render_matrix_rain(fb)
 
     def _render_fireworks(self, fb: FrameBuffer) -> None:
         fb.clear()
@@ -148,6 +157,51 @@ class AnimationScene:
                 heat = min(1.0, 0.2 + (1 - height_ratio) * 0.5 + core * 0.45)
                 palette_index = round(heat * (len(FLAME_PALETTE) - 1))
                 fb.set_pixel(x, y, FLAME_PALETTE[palette_index])
+
+    def _render_matrix_rain(self, fb: FrameBuffer) -> None:
+        """Render falling glyph-like green trails, with detailed blobs on 32×32."""
+        fb.clear()
+        glyph_columns = 8 if fb.width >= 32 else fb.width
+        glyph_rows = 8 if fb.height >= 32 else fb.height
+        for column in range(glyph_columns):
+            trail_length = 3 + column % 4
+            speed = 1 + column % 3
+            for stream in range(2):
+                head = (
+                    (
+                        self.tick * speed // 4
+                        + column * 5
+                        + stream * (glyph_rows // 2 + 2)
+                    )
+                    % (glyph_rows + trail_length)
+                    - trail_length
+                )
+                for trail_offset in range(trail_length):
+                    row = head - trail_offset
+                    if 0 <= row < glyph_rows:
+                        brightness = max(0, len(MATRIX_TRAIL) - 1 - trail_offset)
+                        self._draw_matrix_glyph(
+                            fb,
+                            column,
+                            row,
+                            MATRIX_TRAIL[brightness],
+                            self.tick * speed - row,
+                        )
+
+    @staticmethod
+    def _draw_matrix_glyph(
+        fb: FrameBuffer, column: int, row: int, color: Color, glyph_phase: int
+    ) -> None:
+        if fb.width < 32:
+            fb.set_pixel(column, row, color)
+            return
+        left, top = column * 4, row * 4
+        for y in range(top, top + 3):
+            for x in range(left, left + 3):
+                variation = (
+                    glyph_phase * 17 + column * 11 + row * 7 + (x - left) * 3 + y - top
+                ) % 9
+                fb.set_pixel(x, y, color if variation >= 4 else (0, 0, 0))
 
     @staticmethod
     def _flame_shape(height: int, flame_base: int) -> tuple[int, float]:
